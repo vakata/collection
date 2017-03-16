@@ -1,0 +1,39 @@
+{
+    "name":        "vakata/collection",
+    "description": "PHP collection manipulation class - supports iterators and generators",
+    "license":  "MIT",
+    "keywords": [
+        "vakata",
+        "collection"
+    ],
+    "authors":  [
+        {
+            "name": "vakata",
+            "email": "github@vakata.com",
+            "homepage": "http://www.vakata.com",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "vakata\\collection\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "vakata\\collection\\test\\": "tests"
+        }
+    },
+    "require":  {
+        "php": ">=7.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.7",
+        "clean/phpdoc-md": "dev-master"
+    },
+    "scripts": {
+        "test": "phpunit",
+        "psr2": "php-cs-fixer fix ./src",
+        "phpdoc": "phpdoc-md"
+    }
+}
