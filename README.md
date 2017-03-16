@@ -50,7 +50,7 @@ If you discover any security related issues, please email github@vakata.com inst
 
 ## Credits
 
-A big thanks to im0rtality and the great [Underscore package][https://github.com/Im0rtality/Underscore]
+A big thanks to im0rtality and the great [Underscore package](https://github.com/Im0rtality/Underscore)
 
 - [vakata][link-author]
 - [All Contributors][link-contributors]
