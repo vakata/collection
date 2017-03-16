@@ -3,9 +3,8 @@
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Software License][ico-license]](LICENSE.md)
 [![Build Status][ico-travis]][link-travis]
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/vakata/collection/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/vakata/collection/?branch=master)
-[![Tests Coverage][ico-cc-coverage]][link-cc]
-[![Code Coverage](https://scrutinizer-ci.com/g/vakata/collection/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/vakata/collection/?branch=master)
+[![Scrutinizer Code Quality][ico-code-quality]][link-scrutinizer]
+[![Code Coverage][ico-scrutinizer]][link-scrutinizer]
 
 A PHP class for fast iterables manipulation (arrays, generators, iterators).
 
@@ -71,7 +70,7 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 
 [link-packagist]: https://packagist.org/packages/vakata/collection
 [link-travis]: https://travis-ci.org/vakata/collection
-[link-scrutinizer]: https://scrutinizer-ci.com/g/vakata/collection/code-structure
+[link-scrutinizer]: https://scrutinizer-ci.com/g/vakata/collection
 [link-code-quality]: https://scrutinizer-ci.com/g/vakata/collection
 [link-downloads]: https://packagist.org/packages/vakata/collection
 [link-author]: https://github.com/vakata
