@@ -225,7 +225,7 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
      */
     public function compact() : Collection
     {
-        return $this->filter(function ($v, $k, $array) {
+        return $this->filter(function ($v) {
             return !!$v;
         });
     }
@@ -249,7 +249,7 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
     }
     /**
      * Append more values to the collection
-     * @param  iterable $values the values to add
+     * @param  iterable $source the values to add
      * @return Collection
      */
     public function extend($source) : Collection
@@ -261,7 +261,7 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
     }
     /**
      * Append more values to the collection
-     * @param  iterable $values the values to add
+     * @param  iterable $source the values to add
      * @return Collection
      */
     public function merge($source) : Collection
@@ -396,7 +396,7 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
      */
     public function pluck($key) : Collection
     {
-        return $this->map(function ($v, $k, $array) use ($key) {
+        return $this->map(function ($v) use ($key) {
             return is_object($v) ?
                 (isset($v->{$key}) ? $v->{$key} : null) :
                 (isset($v[$key]) ? $v[$key] : null);
@@ -414,7 +414,7 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
         }
         $keys = array_keys($values);
         $isAssoc = $keys !== array_keys($keys);
-        return $this->filter(function ($v, $k, $array) use ($values, $isAssoc) {
+        return $this->filter(function ($v, $k) use ($values, $isAssoc) {
             return $isAssoc ? 
                 array_search($v, $values) === $k :
                 in_array($v, $values, true);
@@ -620,7 +620,7 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
             if (call_user_func($iterator, $v, $k, $this)) {
                 $res[] = $v;
             }
-            if ($limit && count($res) >= $limit) {
+            if ((int)$limit > 0 && count($res) >= $limit) {
                 break;
             }
         }
