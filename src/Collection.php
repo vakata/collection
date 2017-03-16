@@ -241,7 +241,7 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
         }
         $keys = array_keys($values);
         $isAssoc = $keys !== array_keys($keys);
-        return $this->filter(function ($v, $k, $array) use ($values, $isAssoc) {
+        return $this->filter(function ($v, $k) use ($values, $isAssoc) {
             return $isAssoc ? 
                 ($index = array_search($v, $values)) === false || $index !== $k :
                 !in_array($v, $values, true);

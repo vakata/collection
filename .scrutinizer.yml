@@ -2,7 +2,7 @@ imports:
     - php
 
 tools:
-    external_code_coverage:
+    external_code_coverage: true
         timeout: 600
 
     php_code_sniffer:       true

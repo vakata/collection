@@ -3,8 +3,9 @@
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Software License][ico-license]](LICENSE.md)
 [![Build Status][ico-travis]][link-travis]
-[![Code Climate][ico-cc]][link-cc]
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/vakata/collection/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/vakata/collection/?branch=master)
 [![Tests Coverage][ico-cc-coverage]][link-cc]
+[![Code Coverage](https://scrutinizer-ci.com/g/vakata/collection/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/vakata/collection/?branch=master)
 
 A PHP class for fast iterables manipulation (arrays, generators, iterators).
 
