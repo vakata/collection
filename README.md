@@ -8,6 +8,10 @@
 
 A PHP class for fast iterables manipulation (arrays, generators, iterators).
 
+All predicate / mutator callables receive the current value, current key and the whole collection as arguments.
+
+`map` & `filter` do not execute immediately, but instead stack up until you need to get a value (calling `squash`, `toArray`, `value`). Where possible helpers use `map` & `filter` in order to minimize RAM usage. This means that it is possible to iterate through a large file reading line by line while maintaining a minimal memory footprint.
+
 ## Install
 
 Via Composer

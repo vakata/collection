@@ -192,8 +192,7 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
 
     // mutators
     /**
-     * Filter values from the collection based on a predicate. The callback will receive the value, key and collection.
-     * The operation will be applied when a value needs to be extracted (not immediately)
+     * Filter values from the collection based on a predicate. The callback will receive the value, key and collection
      * @param  callable $iterator the predicate
      * @return $this
      */
@@ -204,7 +203,6 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
     }
     /**
      * Pass all values of the collection through a mutator callable, which will receive the value, key and collection
-     * The operation will be applied when a value needs to be extracted (not immediately)
      * @param  callable $iterator the mutator
      * @return $this
      */

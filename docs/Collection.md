@@ -26,7 +26,7 @@ Iterator, Traversable, ArrayAccess, Serializable, Countable
 |[difference](#collectiondifference)|Exclude all listed values from the collection (uses filter internally).|
 |[each](#collectioneach)|Execute a callable for each item in the collection (does not modify the collection)|
 |[extend](#collectionextend)|Append more values to the collection|
-|[filter](#collectionfilter)|Filter values from the collection based on a predicate. The callback will receive the value, key and collection.|
+|[filter](#collectionfilter)|Filter values from the collection based on a predicate. The callback will receive the value, key and collection|
 |[find](#collectionfind)|Get the first element matching a given criteria (or null)|
 |[findAll](#collectionfindall)|Get all the elements matching a given criteria (with the option to limit the number of results)|
 |[first](#collectionfirst)|Get the first X items from the collection|
@@ -43,8 +43,7 @@ Iterator, Traversable, ArrayAccess, Serializable, Countable
 |[keys](#collectionkeys)|Get all the collection keys|
 |[last](#collectionlast)|Get the last X items from the collection|
 |[lastIndexOf](#collectionlastindexof)|Get the last key corresponding to a value (or false)|
-|[map](#collectionmap)|Pass all values of the collection through a mutator callable, which will receive the value, key and collection
-The operation will be applied when a value needs to be extracted (not immediately)|
+|[map](#collectionmap)|Pass all values of the collection through a mutator callable, which will receive the value, key and collection|
 |[max](#collectionmax)|Get the maximum item in the collection|
 |[merge](#collectionmerge)|Append more values to the collection|
 |[min](#collectionmin)|Get the minimal item in the collection|
@@ -439,9 +438,9 @@ Append more values to the collection
 public filter (callable $iterator)
 ```
 
-Filter values from the collection based on a predicate. The callback will receive the value, key and collection. 
+Filter values from the collection based on a predicate. The callback will receive the value, key and collection 
 
-The operation will be applied when a value needs to be extracted (not immediately) 
+ 
 
 **Parameters**
 
@@ -860,8 +859,7 @@ Get the last key corresponding to a value (or false)
 public map (callable $iterator)
 ```
 
-Pass all values of the collection through a mutator callable, which will receive the value, key and collection
-The operation will be applied when a value needs to be extracted (not immediately) 
+Pass all values of the collection through a mutator callable, which will receive the value, key and collection 
 
  
 
