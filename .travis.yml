@@ -12,8 +12,8 @@ before_script:
   - travis_retry composer update ${COMPOSER_FLAGS} --no-interaction --prefer-source
 
 script:
-  - vendor/bin/phpunit
+  - vendor/bin/phpunit --coverage-clover=coverage.clover
 
 after_script:
-    - bash -c '[[ -f "build/clover.xml" ]] && wget https://scrutinizer-ci.com/ocular.phar'
-    - bash -c '[[ -f "build/clover.xml" ]] && php ocular.phar code-coverage:upload --format=php-clover build/clover.xml'
+    - bash -c 'wget https://scrutinizer-ci.com/ocular.phar'
+    - bash -c 'php ocular.phar code-coverage:upload --format=php-clover coverage.clover'
