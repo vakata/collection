@@ -11,10 +11,8 @@ Iterator, Traversable, ArrayAccess, Serializable, Countable
 
 | Name | Description |
 |------|-------------|
-|[__callStatic](#collection__callstatic)||
 |[__clone](#collection__clone)||
 |[__construct](#collection__construct)|Create an instance|
-|[__debugInfo](#collection__debuginfo)||
 |[__toString](#collection__tostring)||
 |[all](#collectionall)|Do all of the items in the collection match a given criteria|
 |[any](#collectionany)|Do any of the items in the collection match a given criteria|
@@ -81,27 +79,6 @@ Iterator, Traversable, ArrayAccess, Serializable, Countable
 
 
 
-### Collection::__callStatic  
-
-**Description**
-
-```php
-public static __callStatic (void)
-```
-
- 
-
- 
-
-**Parameters**
-
-`This function has no parameters.`
-
-**Return Values**
-
-
-
-
 ### Collection::__clone  
 
 **Description**
@@ -139,27 +116,6 @@ Create an instance
 
 * `(mixed) $input`
 : Anything iterable  
-
-**Return Values**
-
-
-
-
-### Collection::__debugInfo  
-
-**Description**
-
-```php
-public __debugInfo (void)
-```
-
- 
-
- 
-
-**Parameters**
-
-`This function has no parameters.`
 
 **Return Values**
 
@@ -410,7 +366,7 @@ Execute a callable for each item in the collection (does not modify the collecti
 **Description**
 
 ```php
-public extend (\iterable $values)
+public extend (\iterable $source)
 ```
 
 Append more values to the collection 
@@ -419,7 +375,7 @@ Append more values to the collection
 
 **Parameters**
 
-* `(\iterable) $values`
+* `(\iterable) $source`
 : the values to add  
 
 **Return Values**
@@ -905,7 +861,7 @@ Get the maximum item in the collection
 **Description**
 
 ```php
-public merge (\iterable $values)
+public merge (\iterable $source)
 ```
 
 Append more values to the collection 
@@ -914,7 +870,7 @@ Append more values to the collection
 
 **Parameters**
 
-* `(\iterable) $values`
+* `(\iterable) $source`
 : the values to add  
 
 **Return Values**
