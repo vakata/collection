@@ -7,6 +7,7 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
     protected $array = null;
     protected $stack = [];
     protected $iterator = null;
+    protected $val = null;
 
     protected static function rangeGenerator($low, $high, $step = 1)
     {
@@ -112,14 +113,7 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
     }
     public function current()
     {
-        $val = $this->iterator->current();
-        $key = $this->iterator->key();
-        foreach ($this->stack as $action) {
-            if ($action[0] === 'map') {
-                $val = call_user_func($action[1], $val, $key, $this);
-            }
-        }
-        return $val;
+        return $this->val;
     }
     public function rewind()
     {
@@ -132,18 +126,18 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
     public function valid()
     {
         while ($this->iterator->valid()) {
-            $val = $this->iterator->current();
+            $this->val = $this->iterator->current();
             $key = $this->iterator->key();
             $con = false;
             foreach ($this->stack as $action) {
                 if ($action[0] === 'filter') {
-                    if (!call_user_func($action[1], $val, $key, $this)) {
+                    if (!call_user_func($action[1], $this->val, $key, $this)) {
                         $con = true;
                         break;
                     }
                 }
                 if ($action[0] === 'map') {
-                    $val = call_user_func($action[1], $val, $key, $this);
+                    $this->val = call_user_func($action[1], $this->val, $key, $this);
                 }
             }
             if ($con) {
