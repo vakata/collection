@@ -17,13 +17,13 @@ All predicate / mutator callables receive the current value, current key and the
 Via Composer
 
 ``` bash
-$ composer require vakata/collection
+composer require vakata/collection
 ```
 
 ## Usage
 
 ``` php
-$collection = \vakata\collection\Collection::from([1,2,3,4,5,6]); 
+$collection = \vakata\collection\Collection::from([1,2,3,4,5,6]);
 $result = $collection
     ->filter(function ($v) { return $v % 2 === 0; })
     ->map(function ($v) { return $v + 1; })
@@ -36,9 +36,8 @@ Read more in the [API docs](docs/README.md)
 ## Testing
 
 ``` bash
-$ composer test
+composer test
 ```
-
 
 ## Contributing
 
@@ -76,4 +75,3 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 [link-author]: https://github.com/vakata
 [link-contributors]: ../../contributors
 [link-cc]: https://codeclimate.com/github/vakata/collection
-

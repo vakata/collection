@@ -60,14 +60,6 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
     {
         return new static($this->toArray());
     }
-    public static function __callStatic($method, $args)
-    {
-        return (new static(array_shift($args)))->{$method}(...$args);
-    }
-    public function __debugInfo()
-    {
-        return $this->toArray();
-    }
     public function __toString()
     {
         return implode(', ', $this->toArray());
@@ -608,7 +600,6 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
     }
     /**
      * Get all the elements matching a given criteria (with the option to limit the number of results)
-     * @method findAll
      * @param  callable $iterator the search criteria
      * @param  int|null $limit    optional limit to the number of results (default to null - no limit)
      * @return Collection
@@ -628,7 +619,6 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
     }
     /**
      * Get the key corresponding to a value (or false)
-     * @method indexOf
      * @param  mixed  $needle the value to search for
      * @return mixed
      */

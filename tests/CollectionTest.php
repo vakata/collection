@@ -747,4 +747,59 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         // possible that keys were not randomized at all!
         $this->assertEquals($original, $values);
     }
+    public function testCollection()
+    {
+        $ar = [1,2,3];
+        $c1 = Collection::from($ar);
+        $c2 = Collection::from($c1);
+        $this->assertSame($ar, $c2->toArray());
+    }
+    public function testString()
+    {
+        $this->assertSame('1, 2', (string)Collection::from([1, 2]));
+    }
+    public function testSerialize()
+    {
+        $c1 = Collection::from([1,2,3]);
+        $c2 = unserialize(serialize($c1));
+        $this->assertSame($c1->toArray(), $c2->toArray());
+    }
+    public function testNullValue()
+    {
+        $this->assertNull(Collection::from([])->value());
+        $this->assertSame(1, Collection::from([1])->value());
+    }
+    public function testOffsets()
+    {
+        $c1 = Collection::from([1,2,3]);
+        $this->assertSame(2, $c1[1]);
+        $c1[2] = 4;
+        $this->assertSame(4, $c1[2]);
+        $c1['asdf'] = 'asdf';
+        $this->assertSame([1,2,4,'asdf' => 'asdf'], $c1->toArray());
+        unset($c1['asdf']);
+        $this->assertSame([1,2,4], $c1->toArray());
+    }
+    public function testRest()
+    {
+        $this->assertSame([3,4,5], Collection::from([1,2,3,4,5])->rest(2)->toArray());
+    }
+    public function testThru()
+    {
+        $this->assertSame([1,2,3], Collection::from([1,2,3,4,5])->thru(function ($c) { return [1,2,3]; })->toArray());
+    }
+    public function testIteratorKeys()
+    {
+        $this->assertSame([1 => 1,2,3], Collection::from([1,2,3])->zip(new \ArrayObject([1,2,3]))->toArray());
+    }
+    public function testReverse()
+    {
+        $this->assertSame([1,2,3], Collection::from([3,2,1])->reverse()->toArray());
+    }
+    public function testFindAll()
+    {
+        $c1 = Collection::from([1,2,3,4,5,6,7,8]);
+        $this->assertSame([2,4,6,8], $c1->findAll(function ($v) { return $v % 2 === 0; })->toArray());
+        $this->assertSame([2,4], $c1->findAll(function ($v) { return $v % 2 === 0; }, 2)->toArray());
+    }
 }
