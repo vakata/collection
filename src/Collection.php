@@ -156,10 +156,16 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
     // array access
     public function offsetGet($offset)
     {
+        if (count($this->stack) || !($this->array instanceof \ArrayAccess)) {
+            $this->squash();
+        }
         return $this->squash()->iterator->offsetGet($offset);
     }
     public function offsetExists($offset)
     {
+        if (count($this->stack) || !($this->array instanceof \ArrayAccess)) {
+            $this->squash();
+        }
         return $this->squash()->iterator->offsetExists($offset);
     }
     public function offsetUnset($offset)
@@ -176,7 +182,9 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
      */
     public function count()
     {
-        $this->squash();
+        if (count($this->stack) || !($this->array instanceof \Countable)) {
+            $this->squash();
+        }
         return $this->array->count();
     }
 
