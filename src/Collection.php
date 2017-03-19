@@ -7,6 +7,7 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
     protected $array = null;
     protected $stack = [];
     protected $iterator = null;
+    protected $key = null;
     protected $val = null;
 
     protected static function rangeGenerator($low, $high, $step = 1)
@@ -109,7 +110,7 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
     // iterator
     public function key()
     {
-        return $this->iterator->key();
+        return $this->key;
     }
     public function current()
     {
@@ -127,17 +128,20 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
     {
         while ($this->iterator->valid()) {
             $this->val = $this->iterator->current();
-            $key = $this->iterator->key();
+            $this->key = $this->iterator->key();
             $con = false;
             foreach ($this->stack as $action) {
                 if ($action[0] === 'filter') {
-                    if (!call_user_func($action[1], $this->val, $key, $this)) {
+                    if (!call_user_func($action[1], $this->val, $this->key, $this)) {
                         $con = true;
                         break;
                     }
                 }
                 if ($action[0] === 'map') {
-                    $this->val = call_user_func($action[1], $this->val, $key, $this);
+                    $this->val = call_user_func($action[1], $this->val, $this->key, $this);
+                }
+                if ($action[0] === 'mapKey') {
+                    $this->key = call_user_func($action[1], $this->val, $this->key, $this);
                 }
             }
             if ($con) {
@@ -195,6 +199,16 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
     public function map(callable $iterator) : Collection
     {
         $this->stack[] = [ 'map', $iterator ];
+        return $this;
+    }
+    /**
+     * Pass all values of the collection through a key mutator callable, which will receive the value, key and collection
+     * @param  callable $iterator the mutator
+     * @return $this
+     */
+    public function mapKey(callable $iterator) : Collection
+    {
+        $this->stack[] = [ 'mapKey', $iterator ];
         return $this;
     }
     /**

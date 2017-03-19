@@ -802,4 +802,12 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame([2,4,6,8], $c1->findAll(function ($v) { return $v % 2 === 0; })->toArray());
         $this->assertSame([2,4], $c1->findAll(function ($v) { return $v % 2 === 0; }, 2)->toArray());
     }
+    public function testMapKey()
+    {
+        $c1 = Collection::from([ [ "id" => 1, "name" => "A" ], [ "id" => 2, "name" => "B" ], [ "id" => 3, "name" => "C" ] ]);
+        $this->assertSame(
+            [1 => "A", 2 => "B", 3 => "C"],
+            $c1->mapKey(function ($v) { return $v["id"]; })->pluck("name")->toArray()
+        );
+    }
 }
