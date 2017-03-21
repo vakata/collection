@@ -60,7 +60,9 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
     }
     public function __clone()
     {
-        return new static($this->toArray());
+        $this->array = new \ArrayObject(iterator_to_array($this));
+        $this->stack = [];
+        $this->iterator = $this->array->getIterator();
     }
     public function __toString()
     {
@@ -225,7 +227,7 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
      */
     public function clone() : Collection
     {
-        return clone $this;
+        return new static($this->toArray());
     }
     /**
      * Remove all falsy values from the collection (uses filter internally).
