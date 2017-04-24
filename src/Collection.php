@@ -83,9 +83,11 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
      */
     public function squash() : Collection
     {
-        $this->array = new \ArrayObject(iterator_to_array($this));
-        $this->stack = [];
-        $this->iterator = $this->array->getIterator();
+        if (count($this->stack) || !($this->array instanceof \ArrayObject)) {
+            $this->array = new \ArrayObject(iterator_to_array($this));
+            $this->stack = [];
+            $this->iterator = $this->array->getIterator();
+        }
         return $this;
     }
     /**
@@ -94,8 +96,7 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
      */
     public function toArray() : array
     {
-        $this->squash();
-        return $this->array->getArrayCopy();
+        return $this->squash()->array->getArrayCopy();
     }
     /**
      * Gets the first value in the collection or null if empty
@@ -158,25 +159,32 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
     // array access
     public function offsetGet($offset)
     {
-        if (count($this->stack) || !($this->array instanceof \ArrayAccess)) {
-            $this->squash();
-        }
-        return $this->squash()->iterator->offsetGet($offset);
+        return $this->squash()->array->offsetGet($offset);
     }
     public function offsetExists($offset)
     {
-        if (count($this->stack) || !($this->array instanceof \ArrayAccess)) {
-            $this->squash();
-        }
-        return $this->squash()->iterator->offsetExists($offset);
+        return $this->squash()->array->offsetExists($offset);
     }
     public function offsetUnset($offset)
     {
-        return $this->squash()->iterator->offsetUnset($offset);
+        return $this->squash()->array->offsetUnset($offset);
     }
     public function offsetSet($offset, $value)
     {
-        return $this->squash()->iterator->offsetSet($offset, $value);
+        return $this->squash()->array->offsetSet($offset, $value);
+    }
+    public function add($value)
+    {
+        $this->squash()->array->append($value);
+        return $this;
+    }
+    public function append($value)
+    {
+        return $this->add($value);
+    }
+    public function remove($value)
+    {
+        return $this->filter(function ($v) use ($value) { return $v !== $value; })->squash();
     }
     /**
      * Get the collection length
