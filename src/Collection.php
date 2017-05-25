@@ -718,22 +718,25 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
     }
     /**
      * Reduce the collection to a single value
-     * @param  callable $iterator the reducer
+     * @param  callable $iterator the reducer (will recieve the carried value, the value, the key and the collection)
      * @param  mixed    $initial  the initial value
      * @return mixed the final value
      */
     public function reduce(callable $iterator, $initial = null)
     {
-        return array_reduce($this->toArray(), $iterator, $initial);
+        foreach ($this as $k => $v) {
+            $initial = $iterator($initial, $v, $k, $this);
+        }
+        return $initial;
     }
     /**
      * Reduce the collection to a single value, starting from the last element
-     * @param  callable $iterator the reducer
+     * @param  callable $iterator the reducer (will recieve the carried value, the value, the key and the collection)
      * @param  mixed    $initial  the initial value
      * @return mixed the final value
      */
     public function reduceRight(callable $iterator, $initial = null)
     {
-        return array_reduce(array_reverse($this->toArray()), $iterator, $initial);
+        return $this->reverse()->reduce($iterator, $initial);
     }
 }

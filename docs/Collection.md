@@ -14,8 +14,10 @@ Iterator, Traversable, ArrayAccess, Serializable, Countable
 |[__clone](#collection__clone)||
 |[__construct](#collection__construct)|Create an instance|
 |[__toString](#collection__tostring)||
+|[add](#collectionadd)||
 |[all](#collectionall)|Do all of the items in the collection match a given criteria|
 |[any](#collectionany)|Do any of the items in the collection match a given criteria|
+|[append](#collectionappend)||
 |[clone](#collectionclone)|Clone the current collection and return it.|
 |[compact](#collectioncompact)|Remove all falsy values from the collection (uses filter internally).|
 |[contains](#collectioncontains)|Does the collection contain a given value|
@@ -42,6 +44,7 @@ Iterator, Traversable, ArrayAccess, Serializable, Countable
 |[last](#collectionlast)|Get the last X items from the collection|
 |[lastIndexOf](#collectionlastindexof)|Get the last key corresponding to a value (or false)|
 |[map](#collectionmap)|Pass all values of the collection through a mutator callable, which will receive the value, key and collection|
+|[mapKey](#collectionmapkey)|Pass all values of the collection through a key mutator callable, which will receive the value, key and collection|
 |[max](#collectionmax)|Get the maximum item in the collection|
 |[merge](#collectionmerge)|Append more values to the collection|
 |[min](#collectionmin)|Get the minimal item in the collection|
@@ -55,6 +58,7 @@ Iterator, Traversable, ArrayAccess, Serializable, Countable
 |[reduce](#collectionreduce)|Reduce the collection to a single value|
 |[reduceRight](#collectionreduceright)|Reduce the collection to a single value, starting from the last element|
 |[reject](#collectionreject)|Reject values on a given predicate (opposite of filter)|
+|[remove](#collectionremove)||
 |[rest](#collectionrest)|Get all but the first X items from the collection|
 |[reverse](#collectionreverse)|Reverse the collection order|
 |[rewind](#collectionrewind)||
@@ -143,6 +147,27 @@ public __toString (void)
 
 
 
+### Collection::add  
+
+**Description**
+
+```php
+public add (void)
+```
+
+ 
+
+ 
+
+**Parameters**
+
+`This function has no parameters.`
+
+**Return Values**
+
+
+
+
 ### Collection::all  
 
 **Description**
@@ -189,6 +214,27 @@ Do any of the items in the collection match a given criteria
 
 `bool`
 
+
+
+
+
+### Collection::append  
+
+**Description**
+
+```php
+public append (void)
+```
+
+ 
+
+ 
+
+**Parameters**
+
+`This function has no parameters.`
+
+**Return Values**
 
 
 
@@ -832,6 +878,31 @@ Pass all values of the collection through a mutator callable, which will receive
 
 
 
+### Collection::mapKey  
+
+**Description**
+
+```php
+public mapKey (callable $iterator)
+```
+
+Pass all values of the collection through a key mutator callable, which will receive the value, key and collection 
+
+ 
+
+**Parameters**
+
+* `(callable) $iterator`
+: the mutator  
+
+**Return Values**
+
+`$this`
+
+
+
+
+
 ### Collection::max  
 
 **Description**
@@ -1079,7 +1150,7 @@ Reduce the collection to a single value
 **Parameters**
 
 * `(callable) $iterator`
-: the reducer  
+: the reducer (will recieve the carried value, the value, the key and the collection)  
 * `(mixed) $initial`
 : the initial value  
 
@@ -1107,7 +1178,7 @@ Reduce the collection to a single value, starting from the last element
 **Parameters**
 
 * `(callable) $iterator`
-: the reducer  
+: the reducer (will recieve the carried value, the value, the key and the collection)  
 * `(mixed) $initial`
 : the initial value  
 
@@ -1141,6 +1212,27 @@ Reject values on a given predicate (opposite of filter)
 
 `$this`
 
+
+
+
+
+### Collection::remove  
+
+**Description**
+
+```php
+public remove (void)
+```
+
+ 
+
+ 
+
+**Parameters**
+
+`This function has no parameters.`
+
+**Return Values**
 
 
 
