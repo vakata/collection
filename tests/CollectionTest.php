@@ -35,20 +35,24 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
             'Angela' => [
                 'position' => 'dean',
                 'sex'      => 'female',
+                'kids'     => 3
             ],
             'Bob'    => [
                 'position' => 'janitor',
                 'sex'      => 'male',
+                'kids'     => 0
             ],
             'Mark'   => [
                 'position' => 'teacher',
                 'sex'      => 'male',
                 'tenured'  => true,
+                'kids'     => 2
             ],
             'Wendy'  => [
                 'position' => 'teacher',
                 'sex'      => 'female',
                 'tenured'  => 1,
+                'kids'     => 1
             ],
         ];
 
@@ -733,6 +737,60 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
             ->toArray();
 
         $this->assertSame([], $found);
+
+        $found = Collection::from($this->getDummy3())
+            ->where([
+                'position' => ['teacher', 'dean' ],
+            ])
+            ->keys()
+            ->toArray();
+
+        $this->assertSame(['Angela','Mark','Wendy'], $found);
+
+        $found = Collection::from($this->getDummy3())
+            ->where([
+                'kids' => ['beg' => 1, 'end' => 2],
+            ])
+            ->keys()
+            ->toArray();
+
+        $this->assertSame(['Mark','Wendy'], $found);
+
+        $found = Collection::from($this->getDummy3())
+            ->where([
+                'kids' => ['gte' => 1, 'lte' => 2],
+            ])
+            ->keys()
+            ->toArray();
+
+        $this->assertSame(['Mark','Wendy'], $found);
+
+        $found = Collection::from($this->getDummy3())
+            ->where([
+                'kids' => ['lte' => 2],
+            ])
+            ->keys()
+            ->toArray();
+
+        $this->assertSame(['Bob','Mark','Wendy'], $found);
+
+        $found = Collection::from($this->getDummy3())
+            ->where([
+                'kids' => ['lt' => 2],
+            ])
+            ->keys()
+            ->toArray();
+
+        $this->assertSame(['Bob','Wendy'], $found);
+
+        $found = Collection::from($this->getDummy3())
+            ->where([
+                'kids' => [1,3],
+            ])
+            ->keys()
+            ->toArray();
+
+        $this->assertSame(['Angela','Wendy'], $found);
     }
 
     public function testShuffle()

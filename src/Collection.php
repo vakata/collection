@@ -530,8 +530,33 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
         return $this->filter(function ($v) use ($properties, $strict) {
             foreach ($properties as $key => $value) {
                 $vv = is_object($v) ? (isset($v->{$key}) ? $v->{$key} : null) : (isset($v[$key]) ? $v[$key] : null);
-                if (!$vv || ($strict && $vv !== $value) || (!$strict && $vv != $value)) {
-                    return false;
+                if (is_array($value)) {
+                    if (isset($value['beg']) && isset($value['end'])) {
+                        if ($vv < $value['beg'] || $vv > $value['end']) {
+                            return false;
+                        }
+                    } elseif (isset($value['lt']) || isset($value['gt']) || isset($value['lte']) || isset($value['gte'])) {
+                        if (isset($value['lt']) && $vv >= $value['lt']) {
+                            return false;
+                        }
+                        if (isset($value['gt']) && $vv <= $value['gt']) {
+                            return false;
+                        }
+                        if (isset($value['lte']) && $vv > $value['lte']) {
+                            return false;
+                        }
+                        if (isset($value['gte']) && $vv < $value['gte']) {
+                            return false;
+                        }
+                    } else {
+                        if (!in_array($vv, $value, $strict)) {
+                            return false;
+                        }
+                    }
+                } else {
+                    if (($strict && $vv !== $value) || (!$strict && $vv != $value)) {
+                        return false;
+                    }
                 }
             }
             return true;
