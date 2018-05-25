@@ -793,6 +793,66 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(['Angela','Wendy'], $found);
     }
 
+    public function testWhereAll()
+    {
+        $found = Collection::from($this->getDummy3())
+            ->whereAll([
+                ['sex' => 'female'],
+                ['kids' => 3]
+            ])
+            ->keys()
+            ->toArray();
+        $this->assertSame(['Angela'], $found);
+
+        $found = Collection::from($this->getDummy3())
+            ->whereAll([
+                ['sex' => 'female'],
+                ['kids' => ['not' => 2]]
+            ])
+            ->keys()
+            ->toArray();
+        $this->assertSame(['Angela','Wendy'], $found);
+
+        $found = Collection::from($this->getDummy3())
+            ->whereAll([
+                ['sex' => 'female'],
+                ['sex' => 'male']
+            ])
+            ->keys()
+            ->toArray();
+        $this->assertSame([], $found);
+    }
+
+    public function testWhereAny()
+    {
+        $found = Collection::from($this->getDummy3())
+            ->whereAny([
+                ['sex' => 'female'],
+                ['kids' => 3]
+            ])
+            ->keys()
+            ->toArray();
+        $this->assertSame(['Angela','Wendy'], $found);
+
+        $found = Collection::from($this->getDummy3())
+            ->whereAny([
+                ['sex' => 'female'],
+                ['kids' => ['not' => 2]]
+            ])
+            ->keys()
+            ->toArray();
+        $this->assertSame(['Angela','Bob','Wendy'], $found);
+
+        $found = Collection::from($this->getDummy3())
+            ->whereAny([
+                ['sex' => 'female'],
+                ['sex' => 'male']
+            ])
+            ->keys()
+            ->toArray();
+        $this->assertSame(['Angela','Bob','Mark','Wendy'], $found);
+    }
+
     public function testShuffle()
     {
         $original = $this->getDummy3();

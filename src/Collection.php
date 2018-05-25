@@ -519,6 +519,117 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
     {
         return new static(array_values($this->toArray()));
     }
+
+    protected function whereCallback($v, $properties, $strict = true)
+    {
+        foreach ($properties as $key => $value) {
+            $vv = is_object($v) ? (isset($v->{$key}) ? $v->{$key} : null) : (isset($v[$key]) ? $v[$key] : null);
+            $negate = false;
+            if (is_array($value) && count($value) === 1 && isset($value['not'])) {
+                $value = $value['not'];
+                $negate = true;
+            }
+            if (is_array($value) && isset($value['beg']) && strlen($value['beg']) && (!isset($value['end']) || !strlen($value['end']))) {
+                $value = [ 'gte' => $value['beg'] ];
+            }
+            if (is_array($value) && isset($value['end']) && strlen($value['end']) && (!isset($value['beg']) || !strlen($value['beg']))) {
+                $value = [ 'lte' => $value['end'] ];
+            }
+            if (is_array($value)) {
+                if (isset($value['beg']) && isset($value['end'])) {
+                    if ($vv < $value['beg'] || $vv > $value['end']) {
+                        if (!$negate) {
+                            return false;
+                        }
+                    } else {
+                        if ($negate) {
+                            return false;
+                        }
+                    }
+                } elseif (isset($value['lt']) || isset($value['gt']) || isset($value['lte']) || isset($value['gte'])) {
+                    if (isset($value['lt']) && $vv >= $value['lt']) {
+                        if (!$negate) {
+                            return false;
+                        }
+                    } else {
+                        if ($negate) {
+                            return false;
+                        }
+                    }
+                    if (isset($value['gt']) && $vv <= $value['gt']) {
+                        if (!$negate) {
+                            return false;
+                        }
+                    } else {
+                        if ($negate) {
+                            return false;
+                        }
+                    }
+                    if (isset($value['lte']) && $vv > $value['lte']) {
+                        if (!$negate) {
+                            return false;
+                        }
+                    } else {
+                        if ($negate) {
+                            return false;
+                        }
+                    }
+                    if (isset($value['gte']) && $vv < $value['gte']) {
+                        if (!$negate) {
+                            return false;
+                        }
+                    } else {
+                        if ($negate) {
+                            return false;
+                        }
+                    }
+                } else {
+                    if (!in_array($vv, $value, $strict)) {
+                        if (!$negate) {
+                            return false;
+                        }
+                    } else {
+                        if ($negate) {
+                            return false;
+                        }
+                    }
+                }
+            } else {
+                if (($strict && $vv !== $value) || (!$strict && $vv != $value)) {
+                    if (!$negate) {
+                        return false;
+                    }
+                } else {
+                    if ($negate) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    public function whereAll(array $criteria) : Collection
+    {
+        return $this->filter(function ($v) use ($criteria) {
+            foreach ($criteria as $row) {
+                if (!$this->whereCallback($v, $row)) {
+                    return false;
+                }
+            }
+            return true;
+        });
+    }
+    public function whereAny(array $criteria) : Collection
+    {
+        return $this->filter(function ($v) use ($criteria) {
+            foreach ($criteria as $row) {
+                if ($this->whereCallback($v, $row)) {
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
     /**
      * Filter items from the collection using key => value pairs
      * @param  array   $properties the key => value to check for in each item
@@ -528,38 +639,7 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
     public function where(array $properties, $strict = true) : Collection
     {
         return $this->filter(function ($v) use ($properties, $strict) {
-            foreach ($properties as $key => $value) {
-                $vv = is_object($v) ? (isset($v->{$key}) ? $v->{$key} : null) : (isset($v[$key]) ? $v[$key] : null);
-                if (is_array($value)) {
-                    if (isset($value['beg']) && isset($value['end'])) {
-                        if ($vv < $value['beg'] || $vv > $value['end']) {
-                            return false;
-                        }
-                    } elseif (isset($value['lt']) || isset($value['gt']) || isset($value['lte']) || isset($value['gte'])) {
-                        if (isset($value['lt']) && $vv >= $value['lt']) {
-                            return false;
-                        }
-                        if (isset($value['gt']) && $vv <= $value['gt']) {
-                            return false;
-                        }
-                        if (isset($value['lte']) && $vv > $value['lte']) {
-                            return false;
-                        }
-                        if (isset($value['gte']) && $vv < $value['gte']) {
-                            return false;
-                        }
-                    } else {
-                        if (!in_array($vv, $value, $strict)) {
-                            return false;
-                        }
-                    }
-                } else {
-                    if (($strict && $vv !== $value) || (!$strict && $vv != $value)) {
-                        return false;
-                    }
-                }
-            }
-            return true;
+            return $this->whereCallback($v, $properties, $strict);
         });
     }
     /**
