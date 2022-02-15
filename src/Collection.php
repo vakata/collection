@@ -125,7 +125,7 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
     }
     public function next(): void
     {
-        return $this->iterator->next();
+        $this->iterator->next();
     }
     public function valid(): bool
     {
@@ -167,11 +167,11 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
     }
     public function offsetUnset($offset): void
     {
-        return $this->squash()->array->offsetUnset($offset);
+        $this->squash()->array->offsetUnset($offset);
     }
     public function offsetSet($offset, $value): void
     {
-        return $this->squash()->array->offsetSet($offset, $value);
+        $this->squash()->array->offsetSet($offset, $value);
     }
     public function add($value)
     {
