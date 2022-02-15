@@ -119,15 +119,15 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
     {
         return $this->val;
     }
-    public function rewind()
+    public function rewind(): void
     {
         return $this->iterator->rewind();
     }
-    public function next()
+    public function next(): void
     {
         return $this->iterator->next();
     }
-    public function valid()
+    public function valid(): bool
     {
         while ($this->iterator->valid()) {
             $this->val = $this->iterator->current();
@@ -161,15 +161,15 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
     {
         return $this->squash()->array->offsetGet($offset);
     }
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return $this->squash()->array->offsetExists($offset);
     }
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         return $this->squash()->array->offsetUnset($offset);
     }
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         return $this->squash()->array->offsetSet($offset, $value);
     }
@@ -190,7 +190,7 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
      * Get the collection length
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         if (count($this->stack) || !($this->array instanceof \Countable)) {
             $this->squash();
@@ -422,7 +422,7 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
     }
     /**
      * Intersect the collection with another iterable (uses filter internally)
-     * @param  interable $values the data to intersect with
+     * @param  iterable $values the data to intersect with
      * @return $this
      */
     public function intersection($values) : Collection
