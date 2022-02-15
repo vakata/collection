@@ -121,7 +121,7 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
     }
     public function rewind(): void
     {
-        return $this->iterator->rewind();
+        $this->iterator->rewind();
     }
     public function next(): void
     {
