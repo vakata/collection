@@ -64,14 +64,16 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
         $this->stack = [];
         $this->iterator = $this->array->getIterator();
     }
-    public function __toString()
+    public function __toString(): string
     {
         return implode(', ', $this->toArray());
     }
-    public function serialize() {
+    public function serialize(): ?string
+    {
         return serialize($this->toArray());
     }
-    public function unserialize($array) {
+    public function unserialize($array): void
+    {
         $this->array = new \ArrayObject(unserialize($array));
         $this->stack = [];
         $this->iterator = $this->array->getIterator();
@@ -111,11 +113,11 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
     }
 
     // iterator
-    public function key()
+    public function key(): mixed
     {
         return $this->key;
     }
-    public function current()
+    public function current(): mixed
     {
         return $this->val;
     }
@@ -157,7 +159,7 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
     }
 
     // array access
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->squash()->array->offsetGet($offset);
     }

@@ -4,7 +4,7 @@ namespace vakata\collection\test;
 
 use vakata\collection\Collection;
 
-class CollectionTest extends \PHPUnit_Framework_TestCase
+class CollectionTest extends \PHPUnit\Framework\TestCase
 {
     protected function getDummy()
     {
@@ -618,7 +618,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     {
         $dummy = $this->getDummy();
 
-        $mock = $this->getMock('stdClass', ['test']);
+        $mock = $this->getMockBuilder('stdClass')->addMethods(['test'])->getMock(); //, ['test']);
         $mock->expects($this->once())->method('test')->with((array)$dummy);
 
         Collection::from($dummy)->tap([$mock, 'test']);
