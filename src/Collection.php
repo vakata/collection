@@ -2,7 +2,7 @@
 
 namespace vakata\collection;
 
-class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
+class Collection implements \Iterator, \ArrayAccess, \Countable
 {
     protected $array = null;
     protected $stack = [];
@@ -68,13 +68,13 @@ class Collection implements \Iterator, \ArrayAccess, \Serializable, \Countable
     {
         return implode(', ', $this->toArray());
     }
-    public function serialize(): ?string
+    public function __serialize(): array
     {
-        return serialize($this->toArray());
+        return [ 'data' => $this->toArray() ];
     }
-    public function unserialize($array): void
+    public function __unserialize($array): void
     {
-        $this->array = new \ArrayObject(unserialize($array));
+        $this->array = new \ArrayObject($array['data']);
         $this->stack = [];
         $this->iterator = $this->array->getIterator();
     }
