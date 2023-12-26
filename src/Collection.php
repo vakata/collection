@@ -94,10 +94,18 @@ class Collection implements \Iterator, \ArrayAccess, \Countable
     }
     /**
      * Get an actual array from the collection
+     * @param  string|int|null $key optional key to extract
+     * @param  string|int|null $val optional val to extract
      * @return array
      */
-    public function toArray() : array
+    public function toArray($key = null, $val = null) : array
     {
+        if (isset($key)) {
+            $this->pluckKey($key);
+        }
+        if (isset($val)) {
+            $this->pluck($val);
+        }
         return $this->squash()->array->getArrayCopy();
     }
     /**
@@ -408,6 +416,29 @@ class Collection implements \Iterator, \ArrayAccess, \Countable
     public function keys() : Collection
     {
         return $this->map(function ($v, $k) { return $k; })->values();
+    }
+    /**
+     * Pluck a key for each object (uses map internally)
+     * @param  string|int $key the key to extract
+     * @return $this
+     */
+    public function pluckKey($key) : Collection
+    {
+        return $this->mapKey(function ($v, $k) use ($key) {
+            return is_object($v) ?
+                (isset($v->{$key}) ? $v->{$key} : $k) :
+                (isset($v[$key]) ? $v[$key] : $k);
+        });
+    }
+    /**
+     * Pluck a key / val pair for each object (uses map internally)
+     * @param  string|int $key the key to extract
+     * @param  string|int $val the val to extract
+     * @return $this
+     */
+    public function pluckKeyVal($key, $val) : Collection
+    {
+        return $this->pluckKey($key)->pluck($val);
     }
     /**
      * Pluck a value from each object (uses map internally)

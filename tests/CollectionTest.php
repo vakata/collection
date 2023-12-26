@@ -62,7 +62,7 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function getTestRangeData()
+    public static function getTestRangeData()
     {
         $out = [];
         // case #0
@@ -218,6 +218,34 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
             'Bob' => 'janitor',
             'Mark' => 'teacher',
             'Wendy' => 'teacher',
+        ], $value);
+    }
+
+    public function testpluckkey()
+    {
+        $value = Collection::from($this->getDummy3())
+            ->pluckKey('position')
+            ->pluck('sex')
+            ->toArray();
+
+        $this->assertSame([
+            'dean' => 'female',
+            'janitor' => 'male',
+            'teacher' => 'female',
+            'teacher' => 'female',
+        ], $value);
+    }
+    public function testpluckkeyval()
+    {
+        $value = Collection::from($this->getDummy3())
+            ->pluckKeyVal('position', 'sex')
+            ->toArray();
+
+        $this->assertSame([
+            'dean' => 'female',
+            'janitor' => 'male',
+            'teacher' => 'female',
+            'teacher' => 'female',
         ], $value);
     }
 
@@ -590,7 +618,7 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function getTestFlattenData()
+    public static function getTestFlattenData()
     {
         $out = [];
         // case #0
@@ -627,7 +655,7 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function getTestUniqData()
+    public static function getTestUniqData()
     {
         $out = [];
         // case #0
