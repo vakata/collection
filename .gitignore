@@ -3,3 +3,4 @@
 composer.lock
 /tests/coverage/
 /build/
+.phpunit.result.cache

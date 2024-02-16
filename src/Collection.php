@@ -9,14 +9,15 @@ use Iterator;
 use RuntimeException;
 
 /**
- * @template T
- * @implements \Iterator<T>
- * @implements \ArrayAccess<int|string,T>
+ * @template TKey of array-key
+ * @template TVal
+ * @implements \Iterator<TKey,TVal>
+ * @implements \ArrayAccess<TKey,TVal>
  */
 class Collection implements Iterator, ArrayAccess, Countable
 {
     /**
-     * @var ?ArrayObject<int|string,T>
+     * @var ?ArrayObject<TKey,TVal>
      */
     protected ?ArrayObject $array = null;
     protected Iterator $iterator;
@@ -26,7 +27,7 @@ class Collection implements Iterator, ArrayAccess, Countable
     protected array $stack = [];
     protected int|string|null $key = null;
     /**
-     * @var T
+     * @var ?TVal
      */
     protected mixed $val = null;
 
@@ -48,24 +49,24 @@ class Collection implements Iterator, ArrayAccess, Countable
      * @param  int|float  $low  start value
      * @param  int|float  $high end value
      * @param  int|float  $step increment
-     * @return Collection<int|float>
+     * @return Collection<array-key,int|float>
      */
-    public static function range($low, $high, $step = 1): Collection
+    public static function range($low, $high, $step = 1): self
     {
-        return new self(static::rangeGenerator($low, $high, $step));
+        return new self(self::rangeGenerator($low, $high, $step));
     }
     /**
      * A static alias of the __constructor
-     * @param  iterable<T>  $input  Anything iterable
-     * @return Collection<T>
+     * @param  iterable<TKey,TVal>  $input  Anything iterable
+     * @return Collection<TKey,TVal>
      */
-    public static function from(iterable $input): Collection
+    public static function from(iterable $input): self
     {
         return new self($input);
     }
     /**
      * Create an instance
-     * @param iterable<T> $input  Anything iterable
+     * @param iterable<TKey,TVal> $input  Anything iterable
      */
     public function __construct(iterable $input = [])
     {
@@ -87,7 +88,7 @@ class Collection implements Iterator, ArrayAccess, Countable
     }
 
     /**
-     * @return ArrayObject<int|string,T>
+     * @return ArrayObject<TKey,TVal>
      */
     protected function getArray(): ArrayObject
     {
@@ -117,7 +118,7 @@ class Collection implements Iterator, ArrayAccess, Countable
         return [ 'data' => $this->toArray() ];
     }
     /**
-     * @param array{data:array<int|string,T>} $array
+     * @param array{data:array<TKey,TVal>} $array
      */
     public function __unserialize($array): void
     {
@@ -128,9 +129,9 @@ class Collection implements Iterator, ArrayAccess, Countable
 
     /**
      * Applies all pending operations
-     * @return $this
+     * @return Collection<TKey,TVal>
      */
-    public function squash(): static
+    public function squash(): self
     {
         if (count($this->stack) || !isset($this->array)) {
             $this->array = new ArrayObject(iterator_to_array($this));
@@ -143,7 +144,7 @@ class Collection implements Iterator, ArrayAccess, Countable
      * Get an actual array from the collection
      * @param  string|int|null $key optional key to extract
      * @param  string|int|null $val optional val to extract
-     * @return array<int|string,mixed>
+     * @return array<array-key,mixed>
      */
     public function toArray($key = null, $val = null): array
     {
@@ -157,7 +158,7 @@ class Collection implements Iterator, ArrayAccess, Countable
     }
     /**
      * Gets the first value in the collection or null if empty
-     * @return ?T
+     * @return ?TVal
      */
     public function value(): mixed
     {
@@ -168,12 +169,15 @@ class Collection implements Iterator, ArrayAccess, Countable
     }
 
     // iterator
+    /**
+     * @return ?TKey
+     */
     public function key(): mixed
     {
         return $this->key;
     }
     /**
-     * @return T
+     * @return ?TVal
      */
     public function current(): mixed
     {
@@ -217,7 +221,7 @@ class Collection implements Iterator, ArrayAccess, Countable
     }
 
     /**
-     * @return ?T
+     * @return ?TVal
      */
     public function offsetGet($offset): mixed
     {
@@ -233,7 +237,7 @@ class Collection implements Iterator, ArrayAccess, Countable
     }
     /**
      * @param mixed $offset
-     * @param T $value
+     * @param TVal $value
      * @return void
      */
     public function offsetSet($offset, $value): void
@@ -241,27 +245,27 @@ class Collection implements Iterator, ArrayAccess, Countable
         $this->squash()->getArray()->offsetSet($offset, $value);
     }
     /**
-     * @param T $value
-     * @return $this
+     * @param TVal $value
+     * @return Collection<TKey,TVal>
      */
-    public function add($value): static
+    public function add($value): self
     {
         $this->squash()->getArray()->append($value);
         return $this;
     }
     /**
-     * @param T $value
-     * @return $this
+     * @param TVal $value
+     * @return Collection<TKey,TVal>
      */
-    public function append($value): static
+    public function append($value): self
     {
         return $this->add($value);
     }
     /**
-     * @param T $value
-     * @return $this
+     * @param TVal $value
+     * @return Collection<TKey,TVal>
      */
-    public function remove($value): static
+    public function remove($value): self
     {
         return $this->filter(function ($v) use ($value) { return $v !== $value; })->squash();
     }
@@ -287,46 +291,48 @@ class Collection implements Iterator, ArrayAccess, Countable
     /**
      * Filter values from the collection based on a predicate. The callback will receive the value, key and collection
      * @param  callable $iterator the predicate
-     * @return $this
+     * @return Collection<TKey,TVal>
      */
-    public function filter(callable $iterator): Collection
+    public function filter(callable $iterator): self
     {
         $this->stack[] = [ 'filter', $iterator ];
         return $this;
     }
     /**
      * Pass all values of the collection through a mutator callable, which will receive the value, key and collection
-     * @param  callable $iterator the mutator
-     * @return $this
+     * @template TNewVal
+     * @param  callable(TVal, TKey, $this): TNewVal $iterator the mutator
+     * @return Collection<TKey,TNewVal>
      */
-    public function map(callable $iterator): Collection
+    public function map(callable $iterator): self
     {
         $this->stack[] = [ 'map', $iterator ];
         return $this;
     }
     /**
      * Pass all values of the collection through a key mutator callable, which will receive the value, key and collection
-     * @param  callable $iterator the mutator
-     * @return $this
+     * @template TNewKey of array-key
+     * @param  callable(TVal, TKey, $this): TNewKey $iterator the mutator
+     * @return Collection<TNewKey,TVal>
      */
-    public function mapKey(callable $iterator): Collection
+    public function mapKey(callable $iterator): self
     {
         $this->stack[] = [ 'mapKey', $iterator ];
         return $this;
     }
     /**
      * Clone the current collection and return it.
-     * @return Collection<T>
+     * @return Collection<TKey,TVal>
      */
-    public function clone(): Collection
+    public function clone(): self
     {
         return new self($this->toArray());
     }
     /**
      * Remove all falsy values from the collection (uses filter internally).
-     * @return $this
+     * @return Collection<TKey,TVal>
      */
-    public function compact(): Collection
+    public function compact(): self
     {
         return $this->filter(function ($v) {
             return !!$v;
@@ -334,10 +340,10 @@ class Collection implements Iterator, ArrayAccess, Countable
     }
     /**
      * Exclude all listed values from the collection (uses filter internally).
-     * @param  iterable<T> $values the values to exclude
-     * @return $this
+     * @param  iterable<TVal> $values the values to exclude
+     * @return Collection<TKey,TVal>
      */
-    public function difference($values): Collection
+    public function difference($values): self
     {
         if (!is_array($values)) {
             $values = iterator_to_array($values);
@@ -352,10 +358,10 @@ class Collection implements Iterator, ArrayAccess, Countable
     }
     /**
      * Append more values to the collection
-     * @param  iterable<T> $source the values to add
-     * @return Collection<T>
+     * @param  iterable<TKey,TVal> $source the values to add
+     * @return Collection<TKey,TVal>
      */
-    public function extend($source): Collection
+    public function extend($source): self
     {
         if (!is_array($source)) {
             $source = iterator_to_array($source);
@@ -364,18 +370,18 @@ class Collection implements Iterator, ArrayAccess, Countable
     }
     /**
      * Append more values to the collection
-     * @param  iterable<T> $source the values to add
-     * @return Collection<T>
+     * @param  iterable<TKey,TVal> $source the values to add
+     * @return Collection<TKey,TVal>
      */
-    public function merge($source): Collection
+    public function merge($source): self
     {
         return $this->extend($source);
     }
     /**
      * Perform a shallow flatten of the collection
-     * @return Collection<T>
+     * @return Collection<int,mixed>
      */
-    public function flatten(): Collection
+    public function flatten(): self
     {
         $rslt = [];
         $temp = $this->toArray();
@@ -387,13 +393,13 @@ class Collection implements Iterator, ArrayAccess, Countable
     /**
      * Group by a key (if a callable is used - return the value to group by)
      * @param  string|callable $iterator the key to group by
-     * @return Collection<array<T>>
+     * @return Collection<array-key,array<TVal>>
      */
-    public function groupBy($iterator): Collection
+    public function groupBy($iterator): self
     {
-        /** @var array<int|string,array<T>> */
+        /** @var array<array-key,array<TVal>> */
         $rslt = [];
-        /** @var array<int|string,T> $temp */
+        /** @var array<TKey,TVal> $temp */
         $temp = $this->toArray();
         foreach ($temp as $k => $v) {
             $rslt[is_string($iterator) ? (is_object($v) ? $v->{$iterator} : $v[$iterator]) : call_user_func($iterator, $v, $k)][] = $v;
@@ -403,9 +409,9 @@ class Collection implements Iterator, ArrayAccess, Countable
     /**
      * Get the first X items from the collection
      * @param  int $count the number of items to include (defaults to 1)
-     * @return Collection<T>
+     * @return Collection<TKey,TVal>
      */
-    public function first(int $count = 1): Collection
+    public function first(int $count = 1): self
     {
         $i = 0;
         $new = [];
@@ -420,18 +426,18 @@ class Collection implements Iterator, ArrayAccess, Countable
     /**
      * Get the first X items from the collection
      * @param  int $count the number of items to include (defaults to 1)
-     * @return Collection<T>
+     * @return Collection<TKey,TVal>
      */
-    public function head(int $count = 1): Collection
+    public function head(int $count = 1): self
     {
         return $this->first($count);
     }
     /**
      * Get the last X items from the collection
      * @param  int $count the number of items to include (defaults to 1)
-     * @return Collection<T>
+     * @return Collection<TKey,TVal>
      */
-    public function last(int $count = 1): Collection
+    public function last(int $count = 1): self
     {
         $new = $this->toArray();
         return new self(array_slice($new, $count * -1));
@@ -439,18 +445,18 @@ class Collection implements Iterator, ArrayAccess, Countable
     /**
      * Get the last X items from the collection
      * @param  int $count the number of items to include (defaults to 1)
-     * @return Collection<T>
+     * @return Collection<TKey,TVal>
      */
-    public function tail(int $count = 1): Collection
+    public function tail(int $count = 1): self
     {
         return $this->last($count);
     }
     /**
      * Get all but the last X items from the collection
      * @param  int $count the number of items to exclude (defaults to 1)
-     * @return Collection<T>
+     * @return Collection<TKey,TVal>
      */
-    public function initial(int $count = 1): Collection
+    public function initial(int $count = 1): self
     {
         $new = $this->toArray();
         return new self(array_slice($new, 0, $count * -1));
@@ -458,19 +464,19 @@ class Collection implements Iterator, ArrayAccess, Countable
     /**
      * Get all but the first X items from the collection
      * @param  int $count the number of items to exclude (defaults to 1)
-     * @return Collection<T>
+     * @return Collection<TKey,TVal>
      */
-    public function rest(int $count = 1): Collection
+    public function rest(int $count = 1): self
     {
         $new = $this->toArray();
         return new self(array_slice($new, $count));
     }
     /**
      * Execute a callable for each item in the collection (does not modify the collection)
-     * @param callable(T, int|string, Collection<T>): void $iterator the callable to execute
-     * @return $this
+     * @param callable(TVal, TKey, Collection<TKey,TVal>): void $iterator the callable to execute
+     * @return Collection<TKey,TVal>
      */
-    public function each(callable $iterator): Collection
+    public function each(callable $iterator): self
     {
         foreach ($this as $k => $v) {
             call_user_func($iterator, $v, $k, $this);
@@ -480,28 +486,28 @@ class Collection implements Iterator, ArrayAccess, Countable
     /**
      * Execute a callable for each item in the collection (does not modify the collection)
      * @param  callable $iterator the callable to execute
-     * @return $this
+     * @return Collection<TKey,TVal>
      */
-    public function invoke(callable $iterator): Collection
+    public function invoke(callable $iterator): self
     {
         return $this->each($iterator);
     }
     /**
      * Get all the collection keys
-     * @return Collection<int|string>
+     * @return Collection<int,TKey>
      */
-    public function keys(): Collection
+    public function keys(): self
     {
         return $this->map(function ($v, $k) { return $k; })->values();
     }
     /**
      * Pluck a key for each object (uses map internally)
-     * @param  string|int $key the key to extract
-     * @return $this
+     * @param array-key $key the key to extract
+     * @return Collection<array-key,TVal>
      */
-    public function pluckKey($key): Collection
+    public function pluckKey($key): self
     {
-        return $this->mapKey(function ($v, $k) use ($key) {
+        return $this->mapKey(function ($v, $k) use ($key): int|string {
             return is_object($v) ?
                 (isset($v->{$key}) ? $v->{$key} : $k) :
                 (isset($v[$key]) ? $v[$key] : $k);
@@ -509,20 +515,20 @@ class Collection implements Iterator, ArrayAccess, Countable
     }
     /**
      * Pluck a key / val pair for each object (uses map internally)
-     * @param  string|int $key the key to extract
-     * @param  string|int $val the val to extract
-     * @return $this
+     * @param  array-key $key the key to extract
+     * @param  array-key $val the val to extract
+     * @return Collection<array-key,mixed>
      */
-    public function pluckKeyVal($key, $val): Collection
+    public function pluckKeyVal($key, $val): self
     {
         return $this->pluckKey($key)->pluck($val);
     }
     /**
      * Pluck a value from each object (uses map internally)
-     * @param  string|int $key the key to extract
-     * @return $this
+     * @param  array-key $key the key to extract
+     * @return Collection<TKey,mixed>
      */
-    public function pluck($key): Collection
+    public function pluck($key): self
     {
         return $this->map(function ($v) use ($key) {
             return is_object($v) ?
@@ -532,10 +538,10 @@ class Collection implements Iterator, ArrayAccess, Countable
     }
     /**
      * Intersect the collection with another iterable (uses filter internally)
-     * @param  iterable<T> $values the data to intersect with
-     * @return $this
+     * @param  iterable<TVal> $values the data to intersect with
+     * @return Collection<TKey,TVal>
      */
-    public function intersection($values): Collection
+    public function intersection($values): self
     {
         if (!is_array($values)) {
             $values = iterator_to_array($values);
@@ -551,9 +557,9 @@ class Collection implements Iterator, ArrayAccess, Countable
     /**
      * Reject values on a given predicate (opposite of filter)
      * @param  callable $iterator the predicate
-     * @return $this
+     * @return Collection<TKey,TVal>
      */
-    public function reject(callable $iterator): Collection
+    public function reject(callable $iterator): self
     {
         return $this->filter(function ($v, $k, $array) use ($iterator) {
             return !call_user_func($iterator, $v, $k, $array);
@@ -561,9 +567,9 @@ class Collection implements Iterator, ArrayAccess, Countable
     }
     /**
      * Shuffle the values in the collection
-     * @return Collection<T>
+     * @return Collection<TKey,TVal>
      */
-    public function shuffle(): Collection
+    public function shuffle(): self
     {
         $temp = $this->toArray();
         $keys = array_keys($temp);
@@ -577,9 +583,9 @@ class Collection implements Iterator, ArrayAccess, Countable
     /**
      * Sort the collection using a standard sorting function
      * @param  callable $iterator the sort function (must return -1, 0 or 1)
-     * @return Collection<T>
+     * @return Collection<TKey,TVal>
      */
-    public function sortBy(callable $iterator): Collection
+    public function sortBy(callable $iterator): self
     {
         $this->squash();
         $this->getArray()->uasort($iterator);
@@ -588,9 +594,9 @@ class Collection implements Iterator, ArrayAccess, Countable
     /**
      * Inspect the whole collection (as an array) mid-chain
      * @param  callable $iterator the callable to execute
-     * @return $this
+     * @return Collection<TKey,TVal>
      */
-    public function tap(callable $iterator): Collection
+    public function tap(callable $iterator): self
     {
         call_user_func($iterator, $this->toArray());
         return $this;
@@ -598,9 +604,9 @@ class Collection implements Iterator, ArrayAccess, Countable
     /**
      * Modify the whole collection (as an array) mid-chain
      * @param  callable $iterator the callable to execute
-     * @return Collection
+     * @return Collection<array-key,mixed>
      */
-    public function thru(callable $iterator): Collection
+    public function thru(callable $iterator): self
     {
         $temp = $this->toArray();
         $rslt = call_user_func($iterator, $temp);
@@ -608,9 +614,9 @@ class Collection implements Iterator, ArrayAccess, Countable
     }
     /**
      * Leave only unique items in the collection
-     * @return Collection<T>
+     * @return Collection<TKey,TVal>
      */
-    public function unique(): Collection
+    public function unique(): self
     {
         $temp = $this->toArray();
         $rslt = [];
@@ -623,15 +629,15 @@ class Collection implements Iterator, ArrayAccess, Countable
     }
     /**
      * Get only the values of the collection
-     * @return Collection<T>
+     * @return Collection<int,TVal>
      */
-    public function values(): Collection
+    public function values(): self
     {
         return new self(array_values($this->toArray()));
     }
 
     /**
-     * @param T $v
+     * @param TVal $v
      * @param array<string|int,mixed> $properties
      * @param bool $strict
      * @return bool
@@ -726,9 +732,9 @@ class Collection implements Iterator, ArrayAccess, Countable
     }
     /**
      * @param array<array<string|int,mixed>> $criteria
-     * @return Collection<T>
+     * @return Collection<TKey,TVal>
      */
-    public function whereAll(array $criteria): Collection
+    public function whereAll(array $criteria): self
     {
         return $this->filter(function ($v) use ($criteria) {
             foreach ($criteria as $row) {
@@ -741,9 +747,9 @@ class Collection implements Iterator, ArrayAccess, Countable
     }
     /**
      * @param array<array<string|int,mixed>> $criteria
-     * @return Collection<T>
+     * @return Collection<TKey,TVal>
      */
-    public function whereAny(array $criteria): Collection
+    public function whereAny(array $criteria): self
     {
         return $this->filter(function ($v) use ($criteria) {
             foreach ($criteria as $row) {
@@ -758,9 +764,9 @@ class Collection implements Iterator, ArrayAccess, Countable
      * Filter items from the collection using key => value pairs
      * @param  array<string|int,mixed>   $properties the key => value to check for in each item
      * @param  boolean $strict     should the comparison be strict
-     * @return $this
+     * @return Collection<TKey,TVal>
      */
-    public function where(array $properties, $strict = true): Collection
+    public function where(array $properties, $strict = true): self
     {
         return $this->filter(function ($v) use ($properties, $strict) {
             return $this->whereCallback($v, $properties, $strict);
@@ -768,19 +774,20 @@ class Collection implements Iterator, ArrayAccess, Countable
     }
     /**
      * Exclude all listed values from the collection (uses filter internally).
-     * @param  iterable<T> $values the values to exclude
-     * @return $this
+     * @param  iterable<TVal> $values the values to exclude
+     * @return Collection<TKey,TVal>
      */
-    public function without($values): Collection
+    public function without($values): self
     {
         return $this->difference($values);
     }
     /**
      * Combine all the values from the collection with a key
-     * @param iterable<int|string> $keys the keys to use
-     * @return Collection<T>
+     * @template TKeyType of array-key
+     * @param iterable<TKeyType> $keys the keys to use
+     * @return Collection<TKeyType,TVal>
      */
-    public function zip($keys): Collection
+    public function zip($keys): self
     {
         if (!is_array($keys)) {
             $keys = iterator_to_array($keys);
@@ -789,9 +796,9 @@ class Collection implements Iterator, ArrayAccess, Countable
     }
     /**
      * Reverse the collection order
-     * @return Collection<T>
+     * @return Collection<TKey,TVal>
      */
-    public function reverse(): Collection
+    public function reverse(): self
     {
         return new self(array_reverse($this->toArray()));
     }
@@ -827,7 +834,7 @@ class Collection implements Iterator, ArrayAccess, Countable
     }
     /**
      * Does the collection contain a given value
-     * @param  mixed $needle the value to check for
+     * @param  TVal $needle the value to check for
      * @return bool
      */
     public function contains($needle): bool
@@ -842,7 +849,7 @@ class Collection implements Iterator, ArrayAccess, Countable
     /**
      * Get the first element matching a given criteria (or null)
      * @param  callable $iterator the filter criteria
-     * @return mixed
+     * @return ?TVal
      */
     public function find(callable $iterator)
     {
@@ -855,11 +862,11 @@ class Collection implements Iterator, ArrayAccess, Countable
     }
     /**
      * Get all the elements matching a given criteria (with the option to limit the number of results)
-     * @param  callable(T, int|string, $this): bool $iterator the search criteria
+     * @param  callable(TVal, int|string, $this): bool $iterator the search criteria
      * @param  int|null $limit optional limit to the number of results (default to null - no limit)
-     * @return Collection<T>
+     * @return Collection<int,TVal>
      */
-    public function findAll(callable $iterator, int $limit = null): Collection
+    public function findAll(callable $iterator, int $limit = null): self
     {
         $res = [];
         foreach ($this as $k => $v) {
@@ -874,17 +881,18 @@ class Collection implements Iterator, ArrayAccess, Countable
     }
     /**
      * Get the key corresponding to a value (or false)
-     * @param  mixed  $needle the value to search for
-     * @return mixed
+     * @param  TVal  $needle the value to search for
+     * @return ?TKey
      */
     public function indexOf($needle)
     {
-        return array_search($needle, $this->toArray(), true);
+        $rslt = array_search($needle, $this->toArray(), true);
+        return $rslt !== false ? $rslt : null;
     }
     /**
      * Get the last key corresponding to a value (or false)
-     * @param  mixed  $needle the value to search for
-     * @return mixed
+     * @param  TVal  $needle the value to search for
+     * @return ?TKey
      */
     public function lastIndexOf($needle)
     {
@@ -906,7 +914,7 @@ class Collection implements Iterator, ArrayAccess, Countable
     }
     /**
      * Get the minimal item in the collection
-     * @return mixed
+     * @return ?TVal
      */
     public function min()
     {
@@ -922,7 +930,7 @@ class Collection implements Iterator, ArrayAccess, Countable
     }
     /**
      * Get the maximum item in the collection
-     * @return mixed
+     * @return ?TVal
      */
     public function max()
     {
@@ -938,7 +946,7 @@ class Collection implements Iterator, ArrayAccess, Countable
     }
     /**
      * Does the collection contain a given key
-     * @param  string|int  $key the key to check
+     * @param  TKey  $key the key to check
      * @return bool
      */
     public function has($key): bool
