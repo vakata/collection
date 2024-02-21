@@ -956,4 +956,13 @@ class CollectionTest extends \PHPUnit\Framework\TestCase
             $c1->mapKey(function ($v) { return $v["id"]; })->pluck("name")->toArray()
         );
     }
+    public function testNoFilter()
+    {
+        $i = new \stdClass();
+        $c = Collection::from([1, 0, $i, "", "asdf", null, 2.3, [], [1]]);
+        $this->assertSame(
+            [1,$i,"asdf", 2.3, [1]],
+            $c->filter()->values()->toArray()
+        );
+    }
 }

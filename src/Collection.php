@@ -293,8 +293,13 @@ class Collection implements Iterator, ArrayAccess, Countable
      * @param  callable $iterator the predicate
      * @return Collection<TKey,TVal>
      */
-    public function filter(callable $iterator): self
+    public function filter(callable $iterator = null): self
     {
+        if (!isset($iterator)) {
+            $iterator = function ($v) {
+                return !!$v;
+            };
+        }
         $this->stack[] = [ 'filter', $iterator ];
         return $this;
     }
