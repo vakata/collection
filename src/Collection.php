@@ -357,7 +357,7 @@ class Collection implements Iterator, ArrayAccess, Countable
         $isAssoc = $keys !== array_keys($keys);
         return $this->filter(function ($v, $k) use ($values, $isAssoc) {
             return $isAssoc ? 
-                ($index = array_search($v, $values)) === false || $index !== $k :
+                ($index = array_search($v, $values, true)) === false || $index !== $k :
                 !in_array($v, $values, true);
         });
     }
@@ -555,7 +555,7 @@ class Collection implements Iterator, ArrayAccess, Countable
         $isAssoc = $keys !== array_keys($keys);
         return $this->filter(function ($v, $k) use ($values, $isAssoc) {
             return $isAssoc ? 
-                array_search($v, $values) === $k :
+                array_search($v, $values, true) === $k :
                 in_array($v, $values, true);
         });
     }
