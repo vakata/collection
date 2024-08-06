@@ -30,6 +30,7 @@ class Collection implements Iterator, ArrayAccess, Countable
      * @var ?TVal
      */
     protected mixed $val = null;
+    protected bool $changed = false;
 
     /**
      * @param  int|float  $low  start value
@@ -86,6 +87,10 @@ class Collection implements Iterator, ArrayAccess, Countable
             throw new RuntimeException('Invalid collection input');
         }
     }
+    public function changed(): bool
+    {
+        return $this->changed;
+    }
 
     /**
      * @return ArrayObject<TKey,TVal>
@@ -104,6 +109,7 @@ class Collection implements Iterator, ArrayAccess, Countable
     {
         $this->array = new ArrayObject(iterator_to_array($this));
         $this->stack = [];
+        $this->changed = false;
         $this->iterator = $this->array->getIterator();
     }
     public function __toString(): string
@@ -242,6 +248,7 @@ class Collection implements Iterator, ArrayAccess, Countable
      */
     public function offsetSet($offset, $value): void
     {
+        $this->changed = true;
         $this->squash()->getArray()->offsetSet($offset, $value);
     }
     /**
@@ -250,6 +257,7 @@ class Collection implements Iterator, ArrayAccess, Countable
      */
     public function add($value): self
     {
+        $this->changed = true;
         $this->squash()->getArray()->append($value);
         return $this;
     }
@@ -301,6 +309,7 @@ class Collection implements Iterator, ArrayAccess, Countable
             };
         }
         $this->stack[] = [ 'filter', $iterator ];
+        $this->changed = true;
         return $this;
     }
     /**
@@ -577,6 +586,7 @@ class Collection implements Iterator, ArrayAccess, Countable
     public function shuffle(): self
     {
         $temp = $this->toArray();
+        $this->changed = true;
         $keys = array_keys($temp);
         shuffle($keys);
         $rslt = [];
@@ -593,6 +603,7 @@ class Collection implements Iterator, ArrayAccess, Countable
     public function sortBy(callable $iterator): self
     {
         $this->squash();
+        $this->changed = true;
         $this->getArray()->uasort($iterator);
         return $this;
     }
@@ -614,6 +625,7 @@ class Collection implements Iterator, ArrayAccess, Countable
     public function thru(callable $iterator): self
     {
         $temp = $this->toArray();
+        $this->changed = true;
         $rslt = call_user_func($iterator, $temp);
         return new self($rslt);
     }
