@@ -301,7 +301,7 @@ class Collection implements Iterator, ArrayAccess, Countable
      * @param  callable $iterator the predicate
      * @return Collection<TKey,TVal>
      */
-    public function filter(callable $iterator = null): self
+    public function filter(?callable $iterator = null): self
     {
         if (!isset($iterator)) {
             $iterator = function ($v) {
@@ -883,7 +883,7 @@ class Collection implements Iterator, ArrayAccess, Countable
      * @param  int|null $limit optional limit to the number of results (default to null - no limit)
      * @return Collection<int,TVal>
      */
-    public function findAll(callable $iterator, int $limit = null): self
+    public function findAll(callable $iterator, ?int $limit = null): self
     {
         $res = [];
         foreach ($this as $k => $v) {
