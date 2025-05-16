@@ -6,6 +6,7 @@ use ArrayAccess;
 use ArrayObject;
 use Countable;
 use Iterator;
+use JsonSerializable;
 use RuntimeException;
 
 /**
@@ -14,7 +15,7 @@ use RuntimeException;
  * @implements \Iterator<TKey,TVal>
  * @implements \ArrayAccess<TKey,TVal>
  */
-class Collection implements Iterator, ArrayAccess, Countable
+class Collection implements Iterator, ArrayAccess, Countable, JsonSerializable
 {
     /**
      * @var ?ArrayObject<TKey,TVal>
@@ -992,5 +993,10 @@ class Collection implements Iterator, ArrayAccess, Countable
     public function reduceRight(callable $iterator, $initial = null)
     {
         return $this->reverse()->reduce($iterator, $initial);
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return $this->toArray();
     }
 }
